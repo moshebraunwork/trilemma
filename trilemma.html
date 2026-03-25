@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0a0a0f">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f2f7">
+<title>If you know you know</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: rgba(255,255,255,0.06);
+    --good: #a8ff78;
+    --cheap: #38bdf8;
+    --fast: #f87171;
+    --muted: #2e2e3e;
+    --text: #e8e8f0;
+    --sub: #5a5a72;
+    --row-bg: rgba(255,255,255,0.015);
+    --row-active-bg: rgba(255,255,255,0.03);
+    --row-active-border: rgba(255,255,255,0.1);
+    --title-start: #fff;
+    --title-end: rgba(255,255,255,0.35);
+    --glow-bg: rgba(99,102,241,0.07);
+    --noise-op: 0.4;
+    --flash-color: rgba(255,80,80,0.08);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f2f2f7;
+      --surface: #ffffff;
+      --border: rgba(0,0,0,0.07);
+      --good: #2d8c00;
+      --cheap: #0077b6;
+      --fast: #c0392b;
+      --muted: #d0d0de;
+      --text: #0a0a0f;
+      --sub: #9999aa;
+      --row-bg: rgba(0,0,0,0.02);
+      --row-active-bg: rgba(0,0,0,0.035);
+      --row-active-border: rgba(0,0,0,0.1);
+      --title-start: #0a0a0f;
+      --title-end: rgba(10,10,15,0.45);
+      --glow-bg: rgba(99,102,241,0.04);
+      --noise-op: 0.15;
+      --flash-color: rgba(200,0,0,0.05);
+    }
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    padding: 24px 20px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: var(--noise-op);
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    width: 100vw;
+    height: 100vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow-bg) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .header {
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(38px, 10vw, 56px);
+    letter-spacing: 0.05em;
+    line-height: 1.05;
+    background: linear-gradient(135deg, var(--title-start) 30%, var(--title-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background: var(--row-bg);
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s, transform 0.12s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    min-height: 90px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .toggle-row::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+  }
+
+  .toggle-row.good::before  { background: radial-gradient(ellipse at 20% 50%, rgba(168,255,120,0.1) 0%, transparent 65%); }
+  .toggle-row.cheap::before { background: radial-gradient(ellipse at 20% 50%, rgba(56,189,248,0.1) 0%, transparent 65%); }
+  .toggle-row.fast::before  { background: radial-gradient(ellipse at 20% 50%, rgba(248,113,113,0.1) 0%, transparent 65%); }
+
+  @media (prefers-color-scheme: light) {
+    .toggle-row.good::before  { background: radial-gradient(ellipse at 20% 50%, rgba(45,140,0,0.07) 0%, transparent 65%); }
+    .toggle-row.cheap::before { background: radial-gradient(ellipse at 20% 50%, rgba(0,119,182,0.07) 0%, transparent 65%); }
+    .toggle-row.fast::before  { background: radial-gradient(ellipse at 20% 50%, rgba(192,57,43,0.07) 0%, transparent 65%); }
+  }
+  .toggle-row.active::before { opacity: 1; }
+  .toggle-row:active { transform: scale(0.97); }
+  .toggle-row.active {
+    border-color: var(--row-active-border);
+    background: var(--row-active-bg);
+  }
+
+  .label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 9vw, 44px);
+    letter-spacing: 0.08em;
+    transition: color 0.3s;
+    line-height: 1;
+  }
+
+  .toggle-row.good  .label { color: var(--good); }
+  .toggle-row.cheap .label { color: var(--cheap); }
+  .toggle-row.fast  .label { color: var(--fast); }
+  .toggle-row:not(.active) .label { color: var(--muted); }
+
+  .switch {
+    width: 68px;
+    height: 38px;
+    border-radius: 100px;
+    background: var(--muted);
+    position: relative;
+    transition: background 0.3s, box-shadow 0.3s;
+    flex-shrink: 0;
+  }
+
+  .toggle-row.good.active  .switch { background: var(--good);  box-shadow: 0 0 22px color-mix(in srgb, var(--good) 50%, transparent); }
+  .toggle-row.cheap.active .switch { background: var(--cheap); box-shadow: 0 0 22px color-mix(in srgb, var(--cheap) 50%, transparent); }
+  .toggle-row.fast.active  .switch { background: var(--fast);  box-shadow: 0 0 22px color-mix(in srgb, var(--fast) 50%, transparent); }
+
+  .knob {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    top: 5px;
+    left: 5px;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .toggle-row.active .knob { transform: translateX(30px); }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0) scale(1); }
+    20% { transform: translateX(-9px) scale(0.99); }
+    40% { transform: translateX(9px) scale(0.99); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+
+  .shaking { animation: shake 0.42s ease; }
+
+  @keyframes flashOff {
+    0%   { background: var(--flash-color); }
+    100% { background: var(--row-bg); }
+  }
+
+  .flash-off { animation: flashOff 0.45s ease; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <h1 class="title">If you know<br>you know!</h1>
+  </div>
+
+  <div class="toggles">
+    <div class="toggle-row good active" data-key="good">
+      <span class="label">Good</span>
+      <div class="switch"><div class="knob"></div></div>
+    </div>
+
+    <div class="toggle-row cheap" data-key="cheap">
+      <span class="label">Cheap</span>
+      <div class="switch"><div class="knob"></div></div>
+    </div>
+
+    <div class="toggle-row fast active" data-key="fast">
+      <span class="label">Fast</span>
+      <div class="switch"><div class="knob"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const state = { good: true, cheap: false, fast: true };
+
+  function toggle(key) {
+    const isOn = state[key];
+
+    if (!isOn) {
+      const active = Object.keys(state).filter(k => state[k] && k !== key);
+      if (active.length >= 2) {
+        const victim = active[Math.floor(Math.random() * active.length)];
+        const victimEl = document.querySelector(`[data-key="${victim}"]`);
+        victimEl.classList.add('shaking', 'flash-off');
+        setTimeout(() => victimEl.classList.remove('shaking', 'flash-off'), 460);
+        state[victim] = false;
+      }
+      state[key] = true;
+    } else {
+      state[key] = false;
+    }
+
+    render();
+  }
+
+  function render() {
+    Object.keys(state).forEach(key => {
+      const el = document.querySelector(`[data-key="${key}"]`);
+      el.classList.toggle('active', state[key]);
+    });
+  }
+
+  // Handle both touch and click cleanly — no double-fire
+  let tappedAt = 0;
+  document.querySelectorAll('.toggle-row').forEach(row => {
+    const key = row.dataset.key;
+
+    row.addEventListener('touchend', e => {
+      e.preventDefault();
+      tappedAt = Date.now();
+      toggle(key);
+    }, { passive: false });
+
+    row.addEventListener('click', () => {
+      if (Date.now() - tappedAt < 400) return; // already handled by touchend
+      toggle(key);
+    });
+  });
+
+  render();
+</script>
+</body>
+</html>
